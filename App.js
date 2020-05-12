@@ -6,12 +6,11 @@ import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux'
-// import { composeWithDevTools } from 'redux-devtools-extension';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import { applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import rootReducers from './src/store/reducers/rootreducer';
 import MainStack from './src/navigation/StackNavigation'
-import TestScreen from './src/screens/TestScreen';
 import { navigationRef } from './src/navigation/RootNavigator'
 
 
@@ -23,7 +22,7 @@ const fetchFonts = async () => {
   })
 }
 
-const store = createStore(rootReducers, applyMiddleware(thunkMiddleware));
+const store = createStore(rootReducers, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,10 +31,9 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
-        <NavigationContainer ref={navigationRef}>
-          <MainStack />
-        </NavigationContainer>
-        {/* <TestScreen /> */}
+
+        <MainStack />
+
       </Provider>
     );
   }

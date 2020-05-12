@@ -1,10 +1,12 @@
-import React, { useLayoutEffect } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, Keyboard, ScrollView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { headerOptions, commonStyle } from '../../styles/index'
 import { Card, Button } from 'react-native-elements';
 import { Formik } from 'formik';
 import colors from '../../constants/colors';
 import * as yup from 'yup';
+import { useDispatch } from 'react-redux';
+import * as medecinActions from '../../store/actions/medecin';
 
 
 const validationSchema = yup.object().shape({
@@ -14,12 +16,28 @@ const validationSchema = yup.object().shape({
 
 const MedecinAuthScreen = (props) => {
     const { navigation } = props;
+    const [isLoading, setIsLoading] = useState(false);
+    const [errMessage, setErrMessage] = useState(null);
+    const dispatch = useDispatch();
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Je suis Medecin",
             ...headerOptions
         });
     }, [navigation]);
+
+
+    const authHandler = async (email, password) => {
+        try {
+            await dispatch(medecinActions.login(email, password));
+        } catch (error) {
+            setIsLoading(false);
+            setErrMessage(error.message);
+        }
+
+    }
+
+
     return (
         <ScrollView>
             <TouchableOpacity style={{ height: '100%' }} onPress={Keyboard.dismiss} activeOpacity={1}>
@@ -33,7 +51,9 @@ const MedecinAuthScreen = (props) => {
                         <Formik
                             initialValues={{ email: '', password: '' }}
                             onSubmit={(values) => {
-                                console.log(values);
+                                setIsLoading(true);
+                                setErrMessage(null);
+                                authHandler(values.email, values.password);
 
                             }}
                             validationSchema={validationSchema}
@@ -69,7 +89,9 @@ const MedecinAuthScreen = (props) => {
                                         <Button title="Se connecter" titleStyle={commonStyle.btnStyle} buttonStyle={commonStyle.btnBoddyStyle}
                                             TouchableComponent={TouchableOpacity}
                                             onPress={formikProps.handleSubmit}
+                                            loading={isLoading}
                                         />
+                                        {errMessage && <Text style={{ ...styles.errorMessage, textAlign: 'center', marginTop: 10 }}>{errMessage}</Text>}
                                     </View>
                                 </Card>
                             )}

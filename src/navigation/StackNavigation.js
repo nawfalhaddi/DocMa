@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import UserTypeScreen from '../screens/UserTypeScreen';
 import MedecinAuthScreen from '../screens/medecin/MedecinAuthScreen';
 import PatientAuthScreen from '../screens/patient/PatientAuthScreen';
-import TestScreen from '../screens/TestScreen';
-import { useSelector } from 'react-redux';
+import LoadingScreen from '../screens/LoadingScreen';
+import { useSelector, useDispatch } from 'react-redux';
 import MedecinConsultationsScreen from '../screens/medecin/MedecinConsultationsScreen';
 import MedecinPatientsScreen from '../screens/medecin/MedecinPatientsScreen';
 import MedecinCompteScreen from '../screens/medecin/MedecinCompteScreen';
 import MedecinCustomHeader from '../components/UI/MedecinCustomHeader';
 import * as RootNavigation from './RootNavigator'
+import { navigationRef } from './RootNavigator'
+import { NavigationContainer } from '@react-navigation/native';
+import { AsyncStorage } from 'react-native';
+import * as medecinActions from '../store/actions/medecin';
+import * as patientActions from '../store/actions/patient';
+import PatientCompteScreen from '../screens/patient/PatientCompteScreen';
+import PatientConsulationsScreen from '../screens/patient/PatientConsulationsScreen';
+
+
 
 const Stack = createStackNavigator();
 
@@ -57,9 +66,9 @@ const MedecinStack = () => {
 
 const PatientStack = () => {
     return (
-        <Stack.Navigator>
-            <Stack.Screen name="consultations" component={TestScreen} />
-            <Stack.Screen name="compte" component={TestScreen} />
+        <Stack.Navigator initialRouteName='comptePatient'>
+            <Stack.Screen name="consultations" component={PatientConsulationsScreen} />
+            <Stack.Screen name="comptePatient" component={PatientCompteScreen} />
         </Stack.Navigator>
     )
 }
@@ -72,8 +81,44 @@ const MedecinMovingStack = () => (
     </Stack.Navigator>
 )
 
-export default MainStack = () => {
+const MainStack = (props) => {
+    const medecinToken = useSelector(state => state.medecin.token);
+    const accessCode = useSelector(state => state.patient.accessCode);
+    const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(false);
+    // AsyncStorage.clear();
+    useEffect(() => {
+        const tryLogin = async () => {
+            setIsLoading(true);
+            const medecinData = await AsyncStorage.getItem('medecinData');
+            const patientData = await AsyncStorage.getItem('patientData');
+            if (medecinData) {
+                const transformedData = JSON.parse(medecinData);
+                const { email, password } = transformedData;
+                await dispatch(medecinActions.login(email, password));
+                setIsLoading(false);
+            }
+            if (patientData) {
+                const transformedData = JSON.parse(patientData);
+                const { accessCode } = transformedData;
+                await dispatch(patientActions.login(accessCode));
+                setIsLoading(false);
+            }
+            setIsLoading(false);
+            return;
+
+
+        }
+        tryLogin();
+    }, [])
+
     return (
-        <MedecinStack />
+
+        <NavigationContainer ref={navigationRef}>
+            {isLoading ? <LoadingScreen /> : medecinToken ? <MedecinStack /> : accessCode ? <PatientStack /> : <WelcomeStack />}
+
+        </NavigationContainer>
     )
 }
+
+export default MainStack;

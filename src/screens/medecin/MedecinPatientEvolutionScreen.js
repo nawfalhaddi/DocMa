@@ -12,53 +12,55 @@ const MedecinPatientEvolutionScreen = (props) => {
     const alertes = useSelector(state => state.alertes.alertes.filter(item => item.idPatient === patient.id))
     let labels = [];
     let data = [];
-    console.log(moment("2019-06-11").locale('fr').format("Do MMM"));
-    alertes.map((item) => {
-        labels.unshift(moment(item.date).locale('fr').format("Do MMM"));
-        data.unshift(item.temperature);
-    })
+    if (alertes.length > 0) {
+        alertes.map((item) => {
+            labels.unshift(moment(item.date).locale('fr').format("Do MMM"));
+            data.unshift(item.temperature);
+        })
+    }
 
     return (
         <View style={styles.screen}>
-            <Text style={styles.chartTitle}>Evolution: Température / Temps</Text>
-            <LineChart
-                data={{
-                    labels: labels,
-                    datasets: [
-                        {
-                            data: data
+            <Text style={styles.chartTitle}>Température / Temps</Text>
+            {alertes.length > 0 ?
+                <LineChart
+                    data={{
+                        labels: labels,
+                        datasets: [
+                            {
+                                data: data
+                            }
+                        ]
+                    }}
+                    width={Dimensions.get("window").width - 50} // from react-native
+                    height={220}
+                    // yAxisLabel=""
+                    yAxisSuffix="°"
+                    yAxisInterval={1} // optional, defaults to 1
+                    chartConfig={{
+                        backgroundColor: "#fff",
+                        backgroundGradientFrom: "#fff",
+                        backgroundGradientTo: "#fff",
+                        decimalPlaces: 2, // optional, defaults to 2dp
+                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        style: {
+                            borderRadius: 16
+                        },
+                        propsForDots: {
+                            r: "3",
+                            strokeWidth: "2",
+                            stroke: "#ffa726"
                         }
-                    ]
-                }}
-                width={Dimensions.get("window").width - 50} // from react-native
-                height={220}
-                // yAxisLabel=""
-                yAxisSuffix="°"
-                yAxisInterval={1} // optional, defaults to 1
-                chartConfig={{
-                    backgroundColor: "#fff",
-                    backgroundGradientFrom: "#fff",
-                    backgroundGradientTo: "#fff",
-                    decimalPlaces: 2, // optional, defaults to 2dp
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                    style: {
-                        borderRadius: 16
-                    },
-                    propsForDots: {
-                        r: "3",
-                        strokeWidth: "2",
-                        stroke: "#ffa726"
-                    }
-                }}
-                bezier
-                style={{
-                    marginVertical: 20,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: "#000"
-                }}
-            />
+                    }}
+                    bezier
+                    style={{
+                        marginVertical: 20,
+                        borderRadius: 16,
+                        borderWidth: 1,
+                        borderColor: "#000"
+                    }}
+                /> : <Text style={styles.textInformative}>Pas de données pour le moment</Text>}
         </View>
     )
 }
@@ -75,5 +77,9 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsSemiBold',
         fontSize: 18,
         marginTop: 10
+    },
+    textInformative: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 16
     }
 })

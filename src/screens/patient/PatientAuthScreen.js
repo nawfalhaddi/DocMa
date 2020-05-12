@@ -6,12 +6,17 @@ import { Card, Button } from 'react-native-elements';
 import { Formik } from 'formik';
 import { CodeField, Cursor, useBlurOnFulfill, useClearByFocusCell, } from 'react-native-confirmation-code-field';
 import { TouchableOpacity } from 'react-native';
+import { useDispatch } from 'react-redux';
+import * as patientActions from '../../store/actions/patient';
 
 
 const PatientAuthScreen = (props) => {
     const CELL_COUNT = 6;
     const [value, setValue] = useState('');
     const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
+    const [isLoading, setIsLoading] = useState(false);
+    const [errMessage, setErrMessage] = useState(null);
+    const dispatch = useDispatch();
     const [customProps, getCellOnLayoutHandler] = useClearByFocusCell({
         value,
         setValue,
@@ -23,6 +28,18 @@ const PatientAuthScreen = (props) => {
             ...headerOptions
         });
     }, [navigation]);
+    const authHandler = async (code) => {
+        try {
+            await dispatch(patientActions.login(code));
+        } catch (error) {
+            setIsLoading(false);
+            setErrMessage(error.message);
+        }
+
+    }
+
+
+
     return (
         <TouchableOpacity style={{ height: '100%' }} onPress={Keyboard.dismiss} activeOpacity={1}>
 
@@ -37,7 +54,9 @@ const PatientAuthScreen = (props) => {
                 <Formik
                     initialValues={{ code: '' }}
                     onSubmit={(values) => {
-                        console.log(values);
+                        setIsLoading(true);
+                        setErrMessage(null);
+                        authHandler(values.code);
                         setValue('');
                     }}
 
@@ -72,7 +91,9 @@ const PatientAuthScreen = (props) => {
                                 formikProps.values.code = value;
                                 formikProps.handleSubmit();
                             }}
+                                loading={isLoading}
                             />
+                            {errMessage && <Text style={{ ...styles.errorMessage, textAlign: 'center', marginTop: 10 }}>{errMessage}</Text>}
 
                         </Card>
                     )}
@@ -136,5 +157,9 @@ const styles = StyleSheet.create({
         color: '#898A8F',
         textAlign: 'center',
         width: '80%'
+    },
+    errorMessage: {
+        fontFamily: 'PoppinsLight',
+        color: 'red'
     }
 })
