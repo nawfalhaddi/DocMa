@@ -23,7 +23,7 @@ const AlertComponent = (props) => {
             <View style={{ ...styles.mainCard, backgroundColor: alert.vuMedecin === 1 ? 'white' : '#E1E2F2' }}>
                 <View style={styles.firstHalfCard}>
                     <View style={styles.personnageContainer}>
-                        <Text style={styles.heat}>37º</Text>
+                        <Text style={styles.heat}>{alert.temperature}º</Text>
                         <Image source={require('../../assets/pictures/guyWithHeat.png')} style={styles.personnage} />
 
                         <View style={{ ...styles.stateContainer, backgroundColor: alert.douleurDegre <= 3 ? '#4D5CF0' : alert.douleurDegre <= 6 ? '#FACB39' : alert.douleurDegre <= 8 ? '#FF7442' : '#FF4242' }}>
