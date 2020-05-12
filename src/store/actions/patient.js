@@ -1,4 +1,4 @@
-import { PATIENTLOGOUT, PATIENTLOGIN } from '../types'
+import { PATIENTLOGOUT, PATIENTLOGIN, ADDALERT } from '../types'
 import { AsyncStorage } from 'react-native';
 import Alerte from '../../models/alerte';
 import { patients, alertes } from '../../data/dummyData';
@@ -36,8 +36,35 @@ export const login = (accessCode) => {
 
 }
 
-export const authenticate = (accessCode) => {
-    login(accessCode);
+export const addAlert = (values) => {
+    const douleur = parseInt(values.douleur);
+    const temperature = parseInt(values.temperature);
+    const bpm = parseInt(values.bpm);
+    const data = values;
+
+    return async (dispatch, getState) => {
+        patientId = getState().patient.id;
+
+        return await axios.post('/patient/ajoutAlerte', {
+            id_patient: patientId,
+            id_medecin: 1,
+            longitude: data.longitude,
+            latitude: data.latitude,
+            nbr_battement: bpm,
+            degre_douleur: douleur,
+            tension: data.tension,
+            temperature: temperature
+
+        }).then(response => {
+            let item = response.data
+            let alert = new Alerte(item.id, item.id_medecin, item.id_patient, item.longitude, item.latitude, item.date, item.nbr_battement, item.degre_douleur, item.tension, item.temperature, item.remarque, item.date_traitement, item.file_ordonance, item.vu_medecin, item.vu_patient);
+
+            dispatch({ type: ADDALERT, payload: alert });
+        }).catch((error) => {
+            throw new Error(error.response.data);
+        })
+
+    }
 }
 
 const saveDataToStorage = (payload) => {

@@ -3,33 +3,12 @@ import { StyleSheet, Text, View, Modal, TextInput, Keyboard, TouchableWithoutFee
 import RemarqueHeader from '../UI/RemarqueHeader';
 import { Button } from 'react-native-elements';
 import colors from '../../constants/colors';
-import { useDispatch } from 'react-redux';
-import * as alertActions from '../../store/actions/alerte'
 
 const RemarqueModal = (props) => {
     const [modalVisible, setmodalVisible] = useState(props.modalVisible);
     const alert = props.alert;
     const patient = props.patient;
     const [remarque, setRemarque] = useState("")
-    const [isLoading, setIsLoading] = useState(false);
-    const dispatch = useDispatch();
-
-    const handleResponse = async () => {
-        setIsLoading(true);
-        try {
-
-            await dispatch(alertActions.addResponse(remarque, alert.id));
-            setIsLoading(false);
-            props.closeModal();
-
-
-
-        } catch (error) {
-            setIsLoading(false);
-        }
-
-    }
-
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss() }}>
             <Modal
@@ -38,7 +17,7 @@ const RemarqueModal = (props) => {
                 visible={props.modalVisible}
                 onRequestClose={() => { props.closeModal() }}>
                 <View style={styles.screen}>
-                    <RemarqueHeader closeModal={() => { props.closeModal() }} name={patient.fname + " " + patient.lname} douleurDegre={alert.douleurDegre}
+                    <RemarqueHeader closeModal={() => { props.closeModal() }} name={"Dr Hamza Filali"} douleurDegre={alert.douleurDegre}
                         battement={alert.nbrBattement} temperature={alert.temperature} tension={alert.tension}
                     />
 
@@ -56,7 +35,6 @@ const RemarqueModal = (props) => {
                             value={alert.remarque === "" ? remarque : alert.remarque}
                             editable={alert.remarque === "" ? true : false}
                         />
-                        <Button disabled={alert.remarque === "" ? false : true} title="Envoyer" titleStyle={styles.btnTitleStyle} buttonStyle={styles.btnStyle} onPress={() => handleResponse()} loading={isLoading} />
 
                     </View>
                 </View >
@@ -105,18 +83,9 @@ const styles = StyleSheet.create({
         borderRadius: 11,
         borderWidth: 1,
         borderColor: "#C4C4C4",
-        height: 200,
+        height: "90%",
         alignItems: "flex-start",
         justifyContent: 'flex-start',
         padding: 5
     },
-    btnTitleStyle: {
-        fontSize: 14,
-        fontFamily: 'PoppinsSemiBold'
-    },
-    btnStyle: {
-        borderRadius: 18,
-        backgroundColor: colors.primary,
-        marginTop: 10
-    }
 })

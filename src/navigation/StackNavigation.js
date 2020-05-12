@@ -18,6 +18,7 @@ import * as medecinActions from '../store/actions/medecin';
 import * as patientActions from '../store/actions/patient';
 import PatientCompteScreen from '../screens/patient/PatientCompteScreen';
 import PatientConsulationsScreen from '../screens/patient/PatientConsulationsScreen';
+import PatientNewAlert from '../screens/patient/PatientNewAlert';
 
 
 
@@ -65,10 +66,32 @@ const MedecinStack = () => {
 
 
 const PatientStack = () => {
+    const patientName = useSelector(state => state.patient.firstName) + " " + useSelector(state => state.patient.lastName);
     return (
-        <Stack.Navigator initialRouteName='comptePatient'>
-            <Stack.Screen name="consultations" component={PatientConsulationsScreen} />
-            <Stack.Screen name="comptePatient" component={PatientCompteScreen} />
+        <Stack.Navigator initialRouteName='PatientMovingStack'
+            screenOptions={{
+                header: (headerProps) => (
+                    <MedecinCustomHeader name={patientName}
+                        firstItemFunc={() => { headerProps.navigation.navigate("patientConsultations") }}
+                        secondItemFunc={() => { headerProps.navigation.navigate('PatientNewAlert') }}
+                        thirdItemFunc={() => { headerProps.navigation.navigate('patientCompte') }}
+                        firstItemIcon="notifications" secondItemIcon="local-pharmacy" thirdItemIcon="person"
+                        firstItemTitle="Consultations" secondItemTitle="Alerte" thirdItemTitle="Mon compte"
+                    />
+                ),
+            }}
+        >
+            <Stack.Screen name="PatientMovingStack" component={PatientMovingStack} />
+        </Stack.Navigator>
+    )
+}
+const PatientMovingStack = () => {
+    return (
+        <Stack.Navigator initialRouteName='patientConsultations'
+            screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="patientConsultations" component={PatientConsulationsScreen} />
+            <Stack.Screen name="patientCompte" component={PatientCompteScreen} />
+            <Stack.Screen name="PatientNewAlert" component={PatientNewAlert} />
         </Stack.Navigator>
     )
 }

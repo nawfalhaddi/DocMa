@@ -9,7 +9,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/docmaIcon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -24,6 +24,9 @@
     "ios": {
       "supportsTablet": true
     },
-    "description": ""
+    "android": {
+      "package": "com.docmorocco.docma"
+    },
+    "description": "DocMa application dédié aux docteurs de maroc "
   }
 }

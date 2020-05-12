@@ -1,4 +1,5 @@
-import { PATIENTLOGIN, PATIENTLOGOUT } from '../types';
+import { PATIENTLOGIN, PATIENTLOGOUT, ADDALERT } from '../types';
+import { alertes } from '../../data/dummyData';
 const initialState = {
     id: null,
     firstName: null,
@@ -26,6 +27,11 @@ export default (state = initialState, actions) => {
                 lastName: null,
                 accessCode: null,
                 alertes: []
+            }
+        case ADDALERT:
+            return {
+                ...state,
+                alertes: state.alertes.concat(actions.payload)
             }
 
         default:
